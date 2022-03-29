@@ -9,83 +9,83 @@ import java.awt.event.MouseEvent;
  * @author Oualid Hbib
  */
 public class MouseVecCreator implements MouseState {
-	
-	private Vec start, end, vec;
-	private boolean hasVec, isCreatingVec = false;
-	public Color vecColor = Color.yellow;
-	
-	
-	/**
-	 * Sets the starting point of a Vec to create.
-	 */
-	public void mousePressAction(MouseEvent e) {
-		hasVec = false;
-		start = new Vec(e.getX(),e.getY());
-		end = new Vec(e.getX(),e.getY());
-		vec = end.minus(start);
-	}
-	
-	/**
-	 * Dynamically updates a Vec under creation.
-	 */
-	public void mouseDragAction(MouseEvent e) {
-		end.x=e.getX();
-		end.y=e.getY();
-		vec = end.minus(start);
-		isCreatingVec = true;
-	}
-	
-	/**
-	 * Creates a vec and stores it as an available Vec.
-	 */
-	public void mouseReleaseAction(MouseEvent e) {
-		hasVec = true;
-		isCreatingVec = false;
-	}
-	
-	/**
-	 * @return Whether a Vec is available or not.
-	 */
-	public boolean hasVec(){
-		return hasVec;
-	}
-	
-	/**
-	 * @return The created Vec, if available, null otherwise.
-	 */
-	public Vec getVec(){
-		if(hasVec){
-			hasVec = false;
-			return new Vec(vec);
-		}else{
-			return null;
-		}
-	}
-	
-	/**
-	 * @return The origin of the created Vec
-	 */
-	public Vec getOrigin(){
-		return new Vec(start);
-	}
-	
-	/**
-	 * Draws the Vec if it is being created, from the mouse press position
-	 */
-	public void drawState(Graphics g) {
-		if(isCreatingVec)vec.draw(g, start, vecColor);
-	}
 
-	public void mouseClickAction(MouseEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
+    private Vector start, end, vector;
+    private boolean hasVec, isCreatingVec = false;
+    public Color vecColor = Color.yellow;
 
-	public void mouseMoveAction(MouseEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-	
-	
-	
+    /**
+     * Sets the starting point of a Vec to create.
+     */
+    @Override
+	public void mousePressAction(final MouseEvent e) {
+		this.hasVec = false;
+		this.start = new Vector(e.getX(), e.getY());
+		this.end = new Vector(e.getX(), e.getY());
+		this.vector = this.end.minus(this.start);
+    }
+
+    /**
+     * Dynamically updates a Vec under creation.
+     */
+    @Override
+	public void mouseDragAction(final MouseEvent e) {
+		this.end.x = e.getX();
+		this.end.y = e.getY();
+		this.vector = this.end.minus(this.start);
+		this.isCreatingVec = true;
+    }
+
+    /**
+     * Creates a vec and stores it as an available Vec.
+     */
+    @Override
+	public void mouseReleaseAction(final MouseEvent e) {
+		this.hasVec = true;
+		this.isCreatingVec = false;
+    }
+
+    /**
+     * @return Whether a Vec is available or not.
+     */
+    public boolean hasVec() {
+        return this.hasVec;
+    }
+
+    /**
+     * @return The created Vec, if available, null otherwise.
+     */
+    public Vector getVec() {
+        if (this.hasVec) {
+			this.hasVec = false;
+            return new Vector(this.vector);
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * @return The origin of the created Vec
+     */
+    public Vector getOrigin() {
+        return new Vector(this.start);
+    }
+
+    /**
+     * Draws the Vec if it is being created, from the mouse press position
+     */
+    @Override
+	public void drawState(final Graphics g) {
+        if (this.isCreatingVec) this.vector.draw(g, this.start, this.vecColor);
+    }
+
+    @Override
+	public void mouseClickAction(final MouseEvent e) {
+        // TODO Auto-generated method stub
+    }
+
+    @Override
+	public void mouseMoveAction(final MouseEvent e) {
+        // TODO Auto-generated method stub
+    }
 }

@@ -9,59 +9,70 @@ import java.awt.event.MouseEvent;
  * @author Oualid Hbib
  */
 public class MousePan implements MouseState {
-	
-	private Vec start, end, oldPan, pan;
-	
-	public MousePan(){
-		oldPan = new Vec();
-		pan = new Vec();
-	}
-	
-	/**
-	 * Sets the start of the pan addition to the press point.
-	 */
-	public void mousePressAction(MouseEvent e) {
-		oldPan.x = pan.x;
-		oldPan.y = pan.y;
-		start = new Vec(e.getX(),e.getY());
-		end = new Vec(start.x,start.y);
-	}
-	
-	/**
-	 * Changes the pan Vec while dragging to (position of mouse)-(start) added to the oldPan Vec.
-	 */
-	public void mouseDragAction(MouseEvent e) {
-		end.x=e.getX();
-		end.y=e.getY();
-		Vec p = oldPan.plus(end.minus(start));
-		pan.x = p.x;
-		pan.y = p.y;
-	}
-	
-	/**
-	 * Nothing is done on mouse release.
-	 */
-	public void mouseReleaseAction(MouseEvent e) {
-		
-	}
-	
-	/**
-	 * Set the Vec object which will be treated as the pan Vec.
-	 * @param p - the Vec object to treat as pan
-	 */
-	public void setPanVec(Vec p){
-		pan = p;
-	}
 
-	public void drawState(Graphics g) {}
+    private Vector start;
+	private Vector end;
+	private final Vector oldPan;
+	private Vector pan;
 
-	public void mouseClickAction(MouseEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
+    public MousePan() {
+		this.oldPan = new Vector();
+		this.pan = new Vector();
+    }
 
-	public void mouseMoveAction(MouseEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
+    /**
+     * Sets the start of the pan addition to the press point.
+     */
+    @Override
+	public void mousePressAction(final MouseEvent e) {
+		this.oldPan.x = this.pan.x;
+		this.oldPan.y = this.pan.y;
+		this.start = new Vector(e.getX(), e.getY());
+		this.end = new Vector(this.start.x, this.start.y);
+    }
+
+    /**
+     * Changes the pan Vec while dragging to (position of mouse)-(start) added to the oldPan Vec.
+     */
+    @Override
+	public void mouseDragAction(final MouseEvent e) {
+		this.end.x = e.getX();
+		this.end.y = e.getY();
+        final Vector p = this.oldPan.plus(this.end.minus(this.start));
+		this.pan.x = p.x;
+		this.pan.y = p.y;
+    }
+
+    /**
+     * Nothing is done on mouse release.
+     */
+    @Override
+	public void mouseReleaseAction(final MouseEvent e) {
+
+    }
+
+    /**
+     * Set the Vec object which will be treated as the pan Vec.
+     *
+     * @param p - the Vec object to treat as pan
+     */
+    public void setPanVec(final Vector p) {
+		this.pan = p;
+    }
+
+    @Override
+	public void drawState(final Graphics g) {
+    }
+
+    @Override
+	public void mouseClickAction(final MouseEvent e) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+	public void mouseMoveAction(final MouseEvent e) {
+        // TODO Auto-generated method stub
+
+    }
 }
