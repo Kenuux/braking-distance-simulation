@@ -65,7 +65,6 @@ public class Car {
             text = (int) bremsweg + "m Bremsweg bei " + this.highestSpeed + " km/h";
         }
 
-        graphics.setFont(new Font(Font.DIALOG, Font.BOLD, 12));
         graphics.drawString(text, (int) (this.pos.x - this.radius) + this.bufferedImage.getWidth() / 4, (int) (this.pos.y - this.radius) - 15);
     }
 
