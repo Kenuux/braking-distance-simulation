@@ -33,7 +33,7 @@ public class Car {
         this.radius = radius;
 
         try {
-            this.bufferedImage = ImageIO.read(this.getClass().getClassLoader().getResourceAsStream("car" + (carType.ordinal() + 1) + ".png"));
+            this.bufferedImage = ImageIO.read(this.getClass().getClassLoader().getResourceAsStream(carType.getFileName()));
         } catch (final IOException e) {
             e.printStackTrace();
         }
