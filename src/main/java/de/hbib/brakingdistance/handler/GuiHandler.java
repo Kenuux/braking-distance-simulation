@@ -4,7 +4,7 @@ import de.hbib.brakingdistance.api.Car;
 import de.hbib.brakingdistance.api.CarType;
 import de.hbib.brakingdistance.util.MousePan;
 import de.hbib.brakingdistance.util.MouseVecCreator;
-import de.hbib.brakingdistance.util.Vec;
+import de.hbib.brakingdistance.util.Vector;
 import lombok.Getter;
 
 import javax.imageio.ImageIO;
@@ -32,20 +32,19 @@ public class GuiHandler {
     private final JFrame jFrame;
     private final Image canvasImage;
     private final Graphics2D g2;
-    private final JPanel canvas, main;
+    private final JPanel canvas;
 
     private final int canvasX = 2300, canvasY = 1200,
-                        wallX = 1100, wallY = 650;
+            wallX = 1100, wallY = 650;
     private final double sensitivity = 0.03;
 
     //pan amount and zooming scale
-    private final Vec pan = new Vec();
-    private double zoom=1;
+    private final Vector pan = new Vector();
+    private double zoom = 1;
 
     private final List<Car> cars = new ArrayList<>();
 
     private final MouseStateHandler mouseStateHandler = new MouseStateHandler();
-    private final MousePan panState = new MousePan();
     private final MouseVecCreator vecState = new MouseVecCreator();
 
     // UI elements
@@ -54,137 +53,139 @@ public class GuiHandler {
     @Getter private final JLabel chooseCarLabel = new JLabel("Fahrzeugauswahl (Zufall)");
     @Getter private final JLabel generalLabel = new JLabel("Allgemein");
     @Getter private final JLabel speedIntensityLabel = new JLabel("Geschwindigkeitsintensität (Darstellung)");
-    @Getter private final JSlider speedIntensitySlider  = new JSlider(JSlider.HORIZONTAL, 1, 20, 10);
+    @Getter private final JSlider speedIntensitySlider = new JSlider(JSlider.HORIZONTAL, 1, 20, 10);
     @Getter private final JButton brakeButton = new JButton("Bremsen");
     @Getter private final JButton resetButton = new JButton("Reset");
     @Getter private final JLabel brechtLabel = new JLabel("Hindernis");
     @Getter private final JCheckBox brechtBox = new JCheckBox("Bertolt Brecht", true);
 
-    private Rectangle bertoltBrechtRect;
+    private final Rectangle bertoltBrechtRect;
 
     public GuiHandler() throws IOException {
         instance = this;
 
-        jFrame = new JFrame("Bremsweg Simulator (Q2-PH-GK-SEMR-2122 - Oualid Hbib)");
-        jFrame.setVisible(true);
-        jFrame.addWindowListener(new WindowAdapter() {
+        this.jFrame = new JFrame("Bremsweg Simulator (Q2-PH-GK-SEMR-2122 - Oualid Hbib)");
+        this.jFrame.setVisible(true);
+        this.jFrame.addWindowListener(new WindowAdapter() {
             @Override
-            public void windowClosing(WindowEvent e) {
+            public void windowClosing(final WindowEvent e) {
                 System.exit(0);
             }
         });
 
-        generalLabel.setFont(new Font(Font.DIALOG, Font.BOLD, 14));
-        brakeLabel.setFont(new Font(Font.DIALOG, Font.BOLD, 14));
-        chooseCarLabel.setFont(new Font(Font.DIALOG, Font.BOLD, 14));
-        speedIntensityLabel.setFont(new Font(Font.DIALOG, Font.BOLD, 14));
-        brechtLabel.setFont(new Font(Font.DIALOG, Font.BOLD, 14));
+        this.generalLabel.setFont(new Font(Font.DIALOG, Font.BOLD, 14));
+        this.brakeLabel.setFont(new Font(Font.DIALOG, Font.BOLD, 14));
+        this.chooseCarLabel.setFont(new Font(Font.DIALOG, Font.BOLD, 14));
+        this.speedIntensityLabel.setFont(new Font(Font.DIALOG, Font.BOLD, 14));
+        this.brechtLabel.setFont(new Font(Font.DIALOG, Font.BOLD, 14));
 
         // canvas image
-        canvasImage = jFrame.createImage(canvasX, canvasY);
-        g2 = (Graphics2D)canvasImage.getGraphics();
+        this.canvasImage = this.jFrame.createImage(this.canvasX, this.canvasY);
+        this.g2 = (Graphics2D) this.canvasImage.getGraphics();
 
-        BufferedImage bertoltBrechtImage = ImageIO.read(getClass().getClassLoader().getResourceAsStream("bertoltbrecht.png"));
-        this.bertoltBrechtRect = new Rectangle(wallX / 2, 50, bertoltBrechtImage.getWidth(), bertoltBrechtImage.getHeight());
+        final BufferedImage bertoltBrechtImage = ImageIO.read(this.getClass().getClassLoader().getResourceAsStream("bertoltbrecht.png"));
+        this.bertoltBrechtRect = new Rectangle(this.wallX / 2, 50, bertoltBrechtImage.getWidth(), bertoltBrechtImage.getHeight());
 
-        canvas = new JPanel(){
-            public void paintComponent(Graphics g){
+        this.canvas = new JPanel() {
+            @Override
+            public void paintComponent(final Graphics g) {
                 // Clear image
-                g2.setColor( new Color(0,0,0,255));
-                g2.fillRect(0, 0, canvasX, canvasY);
+                GuiHandler.this.g2.setColor(new Color(0, 0, 0, 255));
+                GuiHandler.this.g2.fillRect(0, 0, GuiHandler.this.canvasX, GuiHandler.this.canvasY);
 
                 // Transform
-                g2.translate(pan.x, pan.y);
-                g2.scale(zoom, zoom);
+                GuiHandler.this.g2.translate(GuiHandler.this.pan.x, GuiHandler.this.pan.y);
+                GuiHandler.this.g2.scale(GuiHandler.this.zoom, GuiHandler.this.zoom);
 
                 // Draw Brecht
-                if(brechtBox.isSelected())
-                    g2.drawImage(bertoltBrechtImage, bertoltBrechtRect.x, bertoltBrechtRect.y, null);
+                if (GuiHandler.this.brechtBox.isSelected())
+                    GuiHandler.this.g2.drawImage(bertoltBrechtImage, GuiHandler.this.bertoltBrechtRect.x, GuiHandler.this.bertoltBrechtRect.y, null);
 
                 // Draw cars
-                for (Car car : cars) {
-                    car.draw(g2);
+                for (final Car car : GuiHandler.this.cars) {
+                    car.draw(GuiHandler.this.g2);
                 }
 
-                g.drawImage(canvasImage, 0, 0, null);
+                g.drawImage(GuiHandler.this.canvasImage, 0, 0, null);
 
                 // Draw walls
-                Graphics2D gg = (Graphics2D)g;
-                gg.translate(pan.x, pan.y);
-                gg.scale(zoom, zoom);
+                final Graphics2D gg = (Graphics2D) g;
+                gg.translate(GuiHandler.this.pan.x, GuiHandler.this.pan.y);
+                gg.scale(GuiHandler.this.zoom, GuiHandler.this.zoom);
                 gg.setColor(new Color(255, 255, 255));
-                gg.drawRect(0, 0, wallX, wallY);
-                gg.scale(1/zoom, 1/zoom);
-                gg.translate(-pan.x, -pan.y);
+                gg.drawRect(0, 0, GuiHandler.this.wallX, GuiHandler.this.wallY);
+                gg.scale(1 / GuiHandler.this.zoom, 1 / GuiHandler.this.zoom);
+                gg.translate(-GuiHandler.this.pan.x, -GuiHandler.this.pan.y);
 
-                mouseStateHandler.drawStates(g);
+                GuiHandler.this.mouseStateHandler.drawStates(g);
 
-                g2.scale(1/zoom, 1/zoom);
-                g2.translate(-pan.x, -pan.y);
+                GuiHandler.this.g2.scale(1 / GuiHandler.this.zoom, 1 / GuiHandler.this.zoom);
+                GuiHandler.this.g2.translate(-GuiHandler.this.pan.x, -GuiHandler.this.pan.y);
             }
         };
 
-        main = new JPanel();
-        GroupLayout gl = new GroupLayout(main);
+        JPanel main = new JPanel();
+        final GroupLayout gl = new GroupLayout(main);
         main.setLayout(gl);
 
-        brakeSlider.setMajorTickSpacing(1);
-        brakeSlider.setPaintTicks(true);
-        brakeSlider.setPaintLabels(true);
+        this.brakeSlider.setMajorTickSpacing(1);
+        this.brakeSlider.setPaintTicks(true);
+        this.brakeSlider.setPaintLabels(true);
 
-        speedIntensitySlider.setMajorTickSpacing(3);
-        speedIntensitySlider.setPaintTicks(true);
-        speedIntensitySlider.setPaintLabels(true);
+        this.speedIntensitySlider.setMajorTickSpacing(3);
+        this.speedIntensitySlider.setPaintTicks(true);
+        this.speedIntensitySlider.setPaintLabels(true);
 
-        brakeButton.addActionListener(arg0 -> cars.forEach(car -> car.setBrake(true)));
+        this.brakeButton.addActionListener(arg0 -> this.cars.forEach(car -> car.setBrake(true)));
 
-        resetButton.addActionListener(new ActionListener(){
-            public void actionPerformed(ActionEvent arg0) {
-                cars.clear();
-                zoom=1;
-                centerView();
+        this.resetButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent arg0) {
+                GuiHandler.this.cars.clear();
+                GuiHandler.this.zoom = 1;
+                GuiHandler.this.centerView();
             }
         });
 
         // Add cars as checkboxes
-        for (CarType value : CarType.values()) {
-            carTypeJCheckBoxMap.put(value, new JCheckBox(value.getDisplayName(), true));
+        for (final CarType value : CarType.values()) {
+            this.carTypeJCheckBoxMap.put(value, new JCheckBox(value.getDisplayName(), true));
         }
 
         // Layout
-        GroupLayout.ParallelGroup parallelGroup = gl.createParallelGroup(GroupLayout.Alignment.CENTER, false)
-                .addComponent(generalLabel)
-                .addComponent(resetButton)
-                .addComponent(brakeLabel)
-                .addComponent(brakeSlider)
-                .addComponent(brakeButton)
-                .addComponent(speedIntensityLabel)
-                .addComponent(speedIntensitySlider)
-                .addComponent(chooseCarLabel);
+        final GroupLayout.ParallelGroup parallelGroup = gl.createParallelGroup(GroupLayout.Alignment.CENTER, false)
+                .addComponent(this.generalLabel)
+                .addComponent(this.resetButton)
+                .addComponent(this.brakeLabel)
+                .addComponent(this.brakeSlider)
+                .addComponent(this.brakeButton)
+                .addComponent(this.speedIntensityLabel)
+                .addComponent(this.speedIntensitySlider)
+                .addComponent(this.chooseCarLabel);
 
-        GroupLayout.SequentialGroup sequentialGroup = gl.createSequentialGroup()
-                .addComponent(generalLabel)
-                .addComponent(resetButton)
-                .addComponent(brakeLabel)
-                .addComponent(brakeSlider)
-                .addComponent(brakeButton)
-                .addComponent(speedIntensityLabel)
-                .addComponent(speedIntensitySlider)
-                .addComponent(chooseCarLabel);
+        final GroupLayout.SequentialGroup sequentialGroup = gl.createSequentialGroup()
+                .addComponent(this.generalLabel)
+                .addComponent(this.resetButton)
+                .addComponent(this.brakeLabel)
+                .addComponent(this.brakeSlider)
+                .addComponent(this.brakeButton)
+                .addComponent(this.speedIntensityLabel)
+                .addComponent(this.speedIntensitySlider)
+                .addComponent(this.chooseCarLabel);
 
         this.carTypeJCheckBoxMap.forEach((carType, jCheckBox) -> {
             parallelGroup.addComponent(jCheckBox);
             sequentialGroup.addComponent(jCheckBox);
         });
 
-        parallelGroup.addComponent(brechtLabel);
-        parallelGroup.addComponent(brechtBox);
-        sequentialGroup.addComponent(brechtLabel);
-        sequentialGroup.addComponent(brechtBox);
+        parallelGroup.addComponent(this.brechtLabel);
+        parallelGroup.addComponent(this.brechtBox);
+        sequentialGroup.addComponent(this.brechtLabel);
+        sequentialGroup.addComponent(this.brechtBox);
 
         gl.setHorizontalGroup(
                 gl.createSequentialGroup()
-                        .addComponent(canvas,
+                        .addComponent(this.canvas,
                                 0,
                                 GroupLayout.DEFAULT_SIZE,
                                 Short.MAX_VALUE)
@@ -193,7 +194,7 @@ public class GuiHandler {
 
         gl.setVerticalGroup(
                 gl.createParallelGroup()
-                        .addComponent(canvas,
+                        .addComponent(this.canvas,
                                 0,
                                 GroupLayout.DEFAULT_SIZE,
                                 Short.MAX_VALUE)
@@ -203,157 +204,165 @@ public class GuiHandler {
         gl.setAutoCreateContainerGaps(true);
         gl.setHonorsVisibility(false);
 
-        jFrame.setContentPane(main);
-        jFrame.setSize(wallX+240,wallY+70);
+        this.jFrame.setContentPane(main);
+        this.jFrame.setSize(this.wallX + 240, this.wallY + 70);
 
-        panState.setPanVec(pan);
-        mouseStateHandler.setLeftState(vecState);
-        mouseStateHandler.setRightState(panState);
+        MousePan panState = new MousePan();
+        panState.setPanVec(this.pan);
+        this.mouseStateHandler.setLeftState(this.vecState);
+        this.mouseStateHandler.setRightState(panState);
 
-        MouseAdapter mouse = new MouseAdapter(){
+        final MouseAdapter mouse = new MouseAdapter() {
 
-            public void mouseClicked(MouseEvent e){
-                mouseStateHandler.clickAction(e);
+            @Override
+            public void mouseClicked(final MouseEvent e) {
+                GuiHandler.this.mouseStateHandler.clickAction(e);
             }
 
-            public void mousePressed(MouseEvent e){
-                mouseStateHandler.pressAction(e);
+            @Override
+            public void mousePressed(final MouseEvent e) {
+                GuiHandler.this.mouseStateHandler.pressAction(e);
             }
 
-            public void mouseDragged(MouseEvent e){
-                mouseStateHandler.dragAction(e);
-                jFrame.repaint();
+            @Override
+            public void mouseDragged(final MouseEvent e) {
+                GuiHandler.this.mouseStateHandler.dragAction(e);
+                GuiHandler.this.jFrame.repaint();
             }
 
-            public void mouseReleased(MouseEvent e){
-                mouseStateHandler.releaseAction(e);
+            @Override
+            public void mouseReleased(final MouseEvent e) {
+                GuiHandler.this.mouseStateHandler.releaseAction(e);
 
-                if(vecState.hasVec()){
-                    Vec vel = vecState.getVec().scale(sensitivity/zoom);
-                    Vec pos = vecState.getOrigin().plus(-pan.x, -pan.y).scaleV(1/zoom);
-                    cars.add(new Car(getAvailableCarTypes().get(ThreadLocalRandom.current().nextInt(getAvailableCarTypes().size())), pos, vel, 10));
+                if (GuiHandler.this.vecState.hasVec()) {
+                    final Vector vel = GuiHandler.this.vecState.getVec().scale(GuiHandler.this.sensitivity / GuiHandler.this.zoom);
+                    final Vector pos = GuiHandler.this.vecState.getOrigin().plus(-GuiHandler.this.pan.x, -GuiHandler.this.pan.y).scaleV(1 / GuiHandler.this.zoom);
+                    GuiHandler.this.cars.add(new Car(GuiHandler.this.getAvailableCarTypes().get(ThreadLocalRandom.current().nextInt(GuiHandler.this.getAvailableCarTypes().size())), pos, vel, 10));
                 }
 
-                jFrame.repaint();
+                GuiHandler.this.jFrame.repaint();
             }
 
-            public void mouseMoved(MouseEvent e){
-                mouseStateHandler.moveAction(e);
+            @Override
+            public void mouseMoved(final MouseEvent e) {
+                GuiHandler.this.mouseStateHandler.moveAction(e);
             }
 
-            public void mouseWheelMoved(MouseWheelEvent e){
-                double newZoom = zoom*(1-e.getPreciseWheelRotation()/10);
-                zoom(newZoom, new Vec(e.getX(),e.getY()));
+            @Override
+            public void mouseWheelMoved(final MouseWheelEvent e) {
+                final double newZoom = GuiHandler.this.zoom * (1 - e.getPreciseWheelRotation() / 10);
+                GuiHandler.this.zoom(newZoom, new Vector(e.getX(), e.getY()));
             }
         };
 
-        canvas.addMouseListener(mouse);
-        canvas.addMouseMotionListener(mouse);
-        canvas.addMouseWheelListener(mouse);
+        this.canvas.addMouseListener(mouse);
+        this.canvas.addMouseMotionListener(mouse);
+        this.canvas.addMouseWheelListener(mouse);
 
-        while(true){
+        while (true) {
             try {
                 Thread.sleep(10);
-                update();
-                jFrame.repaint();
-            } catch (ArrayIndexOutOfBoundsException | InterruptedException e) {
+                this.update();
+                this.jFrame.repaint();
+            } catch (final ArrayIndexOutOfBoundsException | InterruptedException e) {
                 e.printStackTrace();
             }
         }
     }
 
-    public void update() throws ArrayIndexOutOfBoundsException{
-        Car a,b;
+    public void update() throws ArrayIndexOutOfBoundsException {
+        Car a, b;
 
-        for(int i=0;i<cars.size();i++){
-            if(this.checkRectCol(cars.get(i), this.bertoltBrechtRect) && brechtBox.isSelected()) {
-                cars.get(i).getVel().scale(-1);
-                cars.get(i).update();
+        for (int i = 0; i < this.cars.size(); i++) {
+            if (this.checkRectCol(this.cars.get(i), this.bertoltBrechtRect) && this.brechtBox.isSelected()) {
+                this.cars.get(i).getVel().scale(-1);
+                this.cars.get(i).update();
                 continue;
             }
-            for(int j=0;j<cars.size();j++){
-                if(i==j)continue;
-                a = cars.get(i);
-                b = cars.get(j);
+            for (int j = 0; j < this.cars.size(); j++) {
+                if (i == j) continue;
+                a = this.cars.get(i);
+                b = this.cars.get(j);
 
-                if(checkCollision(a,b)){
-                    collide(a,b);
+                if (this.checkCollision(a, b)) {
+                    this.collide(a, b);
                 }
             }
 
-            checkWall(cars.get(i));
+            this.checkWall(this.cars.get(i));
 
-            cars.get(i).update();
+            this.cars.get(i).update();
         }
     }
 
-    public boolean checkCollision(Car a, Car b){
-        return a.getPos().minus(b.getPos()).mag()<a.getRadius()+b.getRadius();
+    public boolean checkCollision(final Car a, final Car b) {
+        return a.getPos().minus(b.getPos()).mag() < a.getRadius() + b.getRadius();
     }
 
-    public boolean checkRectCol(Car car, Rectangle rectangle) {
+    public boolean checkRectCol(final Car car, final Rectangle rectangle) {
         return rectangle.contains(car.getPos().x, car.getPos().y);
     }
 
-    public void collide(Car a, Car b){
+    public void collide(final Car a, final Car b) {
         //get vectors
-        Vec ua = a.getVel(), ub = b.getVel();
-        Vec U = ub.minus(ua);
-        Vec n = b.getPos().minus(a.getPos());
-        if(n.mag()==0)return;
-        n.scale(1/n.mag());
+        final Vector ua = a.getVel();
+        final Vector ub = b.getVel();
+        final Vector U = ub.minus(ua);
+        final Vector n = b.getPos().minus(a.getPos());
+        if (n.mag() == 0) return;
+        n.scale(1 / n.mag());
 
         //check if collision is proper
-        if(U.dot(n)>=0){
-            separate(a,b);
+        if (U.dot(n) >= 0) {
+            this.separate(a, b);
         }
     }
 
-    public void separate(Car a, Car b){
-        while(checkCollision(a,b)){
-            Vec r = b.getPos().minus(a.getPos());
-            r.scale(0.01/r.mag());
+    public void separate(final Car a, final Car b) {
+        while (this.checkCollision(a, b)) {
+            final Vector r = b.getPos().minus(a.getPos());
+            r.scale(0.01 / r.mag());
             a.getPos().subtract(r);
             b.getPos().add(r);
         }
     }
 
-    public void checkWall(Car a){
-        if(a.getPos().x<=a.getRadius()){
+    public void checkWall(final Car a) {
+        if (a.getPos().x <= a.getRadius()) {
             a.getVel().x = -a.getVel().x;
-            a.getPos().x=a.getRadius();
+            a.getPos().x = a.getRadius();
         }
-        if(a.getPos().x>=wallX-a.getRadius()){
+        if (a.getPos().x >= this.wallX - a.getRadius()) {
             a.getVel().x = -a.getVel().x;
-            a.getPos().x=wallX-a.getRadius();
+            a.getPos().x = this.wallX - a.getRadius();
         }
-        if(a.getPos().y<=a.getRadius()){
+        if (a.getPos().y <= a.getRadius()) {
             a.getVel().y = -a.getVel().y;
-            a.getPos().y=a.getRadius();
+            a.getPos().y = a.getRadius();
         }
-        if(a.getPos().y>=wallY-a.getRadius()){
+        if (a.getPos().y >= this.wallY - a.getRadius()) {
             a.getVel().y = -a.getVel().y;
-            a.getPos().y=wallY-a.getRadius();
+            a.getPos().y = this.wallY - a.getRadius();
         }
     }
 
-    public void zoom(double newZoom, Vec centre){
-        centre.subtract(pan);
-        pan.subtract(centre.scaleV(newZoom/zoom).minus(centre));
-        zoom = newZoom;
-        jFrame.repaint();
+    public void zoom(final double newZoom, final Vector centre) {
+        centre.subtract(this.pan);
+        this.pan.subtract(centre.scaleV(newZoom / this.zoom).minus(centre));
+        this.zoom = newZoom;
+        this.jFrame.repaint();
     }
 
     private List<CarType> getAvailableCarTypes() {
-        return carTypeJCheckBoxMap.entrySet().stream()
+        return this.carTypeJCheckBoxMap.entrySet().stream()
                 .filter(carTypeJCheckBoxEntry -> carTypeJCheckBoxEntry.getValue().isSelected())
                 .map(Map.Entry::getKey)
                 .collect(Collectors.toList());
     }
 
-    public void centerView(){
-        pan.x= canvas.getWidth()/2 - wallX * zoom / 2;
-        pan.y= canvas.getHeight()/2 - wallY * zoom / 2;
-        jFrame.repaint();
+    public void centerView() {
+        this.pan.x = this.canvas.getWidth() / 2 - this.wallX * this.zoom / 2;
+        this.pan.y = this.canvas.getHeight() / 2 - this.wallY * this.zoom / 2;
+        this.jFrame.repaint();
     }
 }

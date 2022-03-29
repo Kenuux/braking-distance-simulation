@@ -9,7 +9,7 @@ import java.io.IOException;
  */
 public class BrakingDistance {
 
-    public static void main(String[] args) throws IOException {
+    public static void main(final String[] args) throws IOException {
         new GuiHandler();
     }
 }
